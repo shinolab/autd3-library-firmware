@@ -1,0 +1,3 @@
+[submodule "fpga"]
+	path = fpga
+	url = https://github.com/shinolab/autd3-library-firmware-fpga.git
