@@ -3,7 +3,7 @@
 // Created Date: 17/06/2020
 // Author: Shun Suzuki
 // -----
-// Last Modified: 30/10/2020
+// Last Modified: 07/12/2020
 // Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 // -----
 // Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -34,7 +34,7 @@ __attribute__((noinline)) static void wait_ns(uint32_t value) {
 //
 // Division operator (/) and modulo operator (%) are not available when compiling with Release configuration.
 // For some reason, compiling code that contains such operators will not work. (Even if I don't actually call it!)
-// Therefore, I implemented following two functions...(Suzuki, 2020)
+// Therefore, I implemented following two functions...
 static inline uint32_t mod1e9_u32(uint32_t value) {
   if (value < 1000000000UL)
     return value;

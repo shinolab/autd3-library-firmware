@@ -4,7 +4,7 @@
  * Created Date: 29/06/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 11/11/2020
+ * Last Modified: 07/12/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -73,8 +73,11 @@ static volatile uint16_t _lm_buf_fpga_write = 0;
 static volatile uint16_t _ref_clk_cyc_shift = 0;
 static volatile uint16_t _mod_idx_shift = 1;
 
+// fire when ethercat packet arrives
 extern void recv_ethercat(void);
+// fire once after power on
 extern void init_app(void);
+// fire periodically with 1ms interval
 extern void update(void);
 
 typedef enum {
@@ -250,24 +253,24 @@ void update(void) {
     case CMD_CLEAR:
       _commnad = 0x00;
       clear();
-      _sTx.dummy = ((uint16_t)_header_id) << 8;
+      _sTx.ack = ((uint16_t)_header_id) << 8;
       break;
     case CMD_INIT_FPGA_REF_CLOCK:
       _commnad = 0x00;
       init_fpga_ref_clk();
-      _sTx.dummy = ((uint16_t)_header_id) << 8;
+      _sTx.ack = ((uint16_t)_header_id) << 8;
       break;
     case CMD_CALIB_FPGA_LM_CLOCK:
       _commnad = 0x00;
       calib_fpga_stm_clk();
-      _sTx.dummy = 0xE000;
+      _sTx.ack = 0xE000;
       break;
   }
 
   if (_lm_end && (_lm_buf_fpga_write == _lm_cycle)) {
     _lm_end = false;
     r = init_fpga_stm_clk();
-    _sTx.dummy = 0xC000 | r;
+    _sTx.ack = 0xC000 | r;
   }
 }
 
@@ -301,19 +304,19 @@ void recv_ethercat(void) {
         cmd_op(header);
         _ctrl_flag = header->control_flags;
         bram_write(BRAM_PROPS_SELECT, CF_AND_CP_ADDR, _ctrl_flag);
-        _sTx.dummy = ((uint16_t)(header->msg_id)) << 8;
+        _sTx.ack = ((uint16_t)(header->msg_id)) << 8;
         break;
 
       case CMD_WR_BRAM:
         cmd_wr_bram();
         _ctrl_flag = header->control_flags;
-        _sTx.dummy = ((uint16_t)(header->msg_id)) << 8;
+        _sTx.ack = ((uint16_t)(header->msg_id)) << 8;
         break;
 
       case CMD_LM_MODE:
         recv_foci(header);
         _ctrl_flag = header->control_flags;
-        _sTx.dummy = ((uint16_t)(header->msg_id)) << 8;
+        _sTx.ack = ((uint16_t)(header->msg_id)) << 8;
         break;
 
       case CMD_INIT_FPGA_REF_CLOCK:
@@ -325,7 +328,7 @@ void recv_ethercat(void) {
       case CMD_CALIB_FPGA_LM_CLOCK:
         _shift = _sRx0.data[0];
         if (_shift == 0) {
-          _sTx.dummy = 0xE000;
+          _sTx.ack = 0xE000;
         } else {
           bram_write(BRAM_PROPS_SELECT, LM_CALIB_SHIFT_ADDR, _shift);
         }
@@ -333,19 +336,19 @@ void recv_ethercat(void) {
         break;
 
       case CMD_RD_CPU_V_LSB:
-        _sTx.dummy = (((uint16_t)(header->msg_id)) << 8) | (get_cpu_version() & 0x00FF);
+        _sTx.ack = (((uint16_t)(header->msg_id)) << 8) | (get_cpu_version() & 0x00FF);
         break;
 
       case CMD_RD_CPU_V_MSB:
-        _sTx.dummy = (((uint16_t)(header->msg_id)) << 8) | ((get_cpu_version() & 0xFF00) >> 8);
+        _sTx.ack = (((uint16_t)(header->msg_id)) << 8) | ((get_cpu_version() & 0xFF00) >> 8);
         break;
 
       case CMD_RD_FPGA_V_LSB:
-        _sTx.dummy = (((uint16_t)(header->msg_id)) << 8) | (get_fpga_version() & 0x00FF);
+        _sTx.ack = (((uint16_t)(header->msg_id)) << 8) | (get_fpga_version() & 0x00FF);
         break;
 
       case CMD_RD_FPGA_V_MSB:
-        _sTx.dummy = (((uint16_t)(header->msg_id)) << 8) | ((get_fpga_version() & 0xFF00) >> 8);
+        _sTx.ack = (((uint16_t)(header->msg_id)) << 8) | ((get_fpga_version() & 0xFF00) >> 8);
         break;
       default:
         _commnad = header->command;

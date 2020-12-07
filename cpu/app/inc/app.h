@@ -3,7 +3,7 @@
 // Created Date: 04/12/2020
 // Author: Shun Suzuki
 // -----
-// Last Modified: 04/12/2020
+// Last Modified: 07/12/2020
 // Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 // -----
 // Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -60,13 +60,13 @@ typedef int bool_t;
 #define TRANS_NUM_IN_Y (14)
 #define TRANS_SIZE (10.18f)
 #define ULTRASOUND_WAVELENGTH (8.5f)
-#define ULTRASOUND_SCALE (30.0f)  // 255.0f / ULTRASOUND_WAVELENGTH
+#define ULTRASOUND_SCALE (255.0f / ULTRASOUND_WAVELENGTH)
 
 #define LM_BUF_SEGMENT_SIZE (2048)
 
 #define IS_MISSING_TRANSDUCER(X, Y) (Y == 1 && (X == 1 || X == 2 || X == 16))
 
-#define FPGA_BASE 0x44000000 /* CS1 FPGAアドレス */
+#define FPGA_BASE 0x44000000 /* CS1 FPGA address */
 
 static inline void word_cpy(uint16_t *dst, uint16_t *src, uint32_t cnt) {
   while (cnt-- > 0) {
@@ -125,17 +125,17 @@ typedef struct {
 
 typedef struct {
   uint16_t reserved;
-  uint16_t data[249]; /* センサー情報 */
+  uint16_t data[249]; /* Data from PC */
 } RX_STR0;
 
 typedef struct {
   uint16_t reserved;
-  uint16_t data[64]; /* 拡張データ */
+  uint16_t data[64]; /* Header from PC */
 } RX_STR1;
 
 typedef struct {
   uint16_t reserved;
-  uint16_t dummy;
+  uint16_t ack;
 } TX_STR;
 
 #endif /* APP_H_ */
