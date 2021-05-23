@@ -1,6 +1,6 @@
 # README
 
-Version: 0.9
+Version: 1.0
 
 * This is a repository of AUTD3 firmware, which contains the code for the FPGA and the CPU board (AP-RZT-0A)
     * However, some CPU codes contain proprietary parts and are therefore omitted.
@@ -9,4 +9,4 @@ Version: 0.9
 
 # Author
 
-Shun Suzuki, 2020-
+Shun Suzuki, 2020-2021
